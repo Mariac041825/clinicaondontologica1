@@ -1,54 +1,41 @@
 $(document).ready(function () {
-    
+    // Diálogo para agregar paciente
     $("#frmPaciente").dialog({
         autoOpen: false,
         height: 310,
         width: 400,
         modal: true,
         buttons: {
-            "Insertar": insertarPaciente,
-            "Cancelar": cancelar
+            "Insertar": function () {
+                insertarPaciente();
+                $(this).dialog('close');
+            },
+            "Cancelar": function () {
+                $(this).dialog("close");
+            }
         }
     });
 
-  
+    // Diálogo para agregar médico
     $("#frmMedico").dialog({
         autoOpen: false,
         height: 250,
         width: 400,
         modal: true,
         buttons: {
-            "Guardar": insertarMedico, 
-            "Cancelar": cancelar
+            "Guardar": function () {
+                insertarMedico();
+            },
+            "Cancelar": function () {
+                $(this).dialog("close");
+            }
         },
         close: function () {
-           
             $("#agregarMedico")[0].reset();
         }
     });
 
-    $("#modalPaciente").dialog({
-        autoOpen: false,
-        height: 250,
-        width: 400,
-        modal: true,
-        buttons: {
-            "Guardar": insertarMedico, 
-            "Cancelar": cancelar
-        },
-        close: function () {
-           
-            $("#agregarMedico")[0].reset();
-        }
-    });
-
-
-
-
-
-
-
-   
+    // Botón para abrir formulario de edición de médico
     $('.editar-medico').click(function (e) {
         e.preventDefault();
         var idMedico = $(this).data('id');
@@ -76,17 +63,19 @@ $(document).ready(function () {
         });
     });
 
+    // Cargar horas cuando cambia médico o fecha
+    $("#medico, #fecha").change(cargarHoras);
+});
 
 
+// 🧩 FUNCIONES AUXILIARES
 
-
-
-
-
-}); 
 function consultarPaciente() {
-    var url = "index.php?accion=consultarPaciente&documento=" + $("#asignarDocumento").val();
-    $("#paciente").load(url, function () { });
+    var doc = $("#asignarDocumento").val().trim();
+    if (doc !== "") {
+        var url = "index.php?accion=consultarPaciente&documento=" + doc;
+        $("#paciente").load(url);
+    }
 }
 
 function mostrarFormulario() {
@@ -99,53 +88,37 @@ function insertarPaciente() {
     var queryString = $("#agregarPaciente").serialize();
     var url = "index.php?accion=ingresarPaciente&" + queryString;
     $("#paciente").load(url);
-    $("#frmPaciente").dialog('close');
 }
 
-
+// Mostrar modal de médico vacío
 function mostrarFormularioMedico() {
     $("#MedDocumento").val('');
     $("#MedNombres").val('');
     $("#MedApellidos").val('');
-
+    $("#MedContrasena").val('');
     $("#frmMedico").dialog('open');
-    
 }
 
-function iniciosesionpaciente(){
-     $("#modalPaciente").dialog('open');
-}
-
-
+// Insertar médico vía AJAX
 function insertarMedico() {
-  
-
     $.ajax({
-        url: "index.php?accion=agregarMedico", 
-        type: "POST", 
-        data: $("#agregarMedico").serialize(), 
+        url: "index.php?accion=agregarMedico",
+        type: "POST",
+        data: $("#agregarMedico").serialize(),
         success: function (response) {
-            alert(response); 
-            $("#frmMedico").dialog('close'); 
-            location.reload(); 
+            alert("Médico agregado correctamente");
+            $("#frmMedico").dialog('close');
+            location.reload();
         },
         error: function () {
-            alert("Error al agregar el médico."); 
+            alert("Error al agregar el médico.");
         }
     });
 }
 
-/**
- * Función genérica para cerrar diálogos.
- * 'this' se refiere al elemento del diálogo que la llamó.
- */
-function cancelar() {
-    $(this).dialog('close');
-}
-
-// --- El resto de tus funciones ---
+// Cargar horas disponibles según médico y fecha
 function cargarHoras() {
-    if ($("#medico").val() == -1 || $("#fecha").val() == "") {
+    if ($("#medico").val() == -1 || $("#fecha").val() === "") {
         $("#hora").html("<option value='-1' selected='selected'>--Seleccione la hora---</option>");
     } else {
         var queryString = "medico=" + $("#medico").val() + "&fecha=" + $("#fecha").val();
@@ -153,28 +126,28 @@ function cargarHoras() {
         $("#hora").load(url);
     }
 }
-function seleccionarHora() {
-    if ($("#medico").val() == -1) {
-        alert("Debe seleccionar un médico");
-    } else if ($("#fecha").val() == "") {
-        alert("Debe seleccionar una fecha");
+
+function consultarCitas() {
+    var doc = $("#consultarDocumento").val().trim();
+    if (doc !== "") {
+        var url = "index.php?accion=consultarCitas&consultarDocumento=" + doc;
+        $("#paciente2").load(url);
     }
 }
-function consultarCitas() {
-    url = "index.php?accion=consultarCitas&consultarDocumento=" +
-        $("#consultarDocumento").val();
-    $("#paciente2").load(url);
-}
+
 function cancelarConsultar() {
-    url = "index.php?accion=cancelarCitas&cancelarDocumento=" +
-        $("#cancelarDocumento").val();
-    $("#paciente3").load(url);
+    var doc = $("#cancelarDocumento").val().trim();
+    if (doc !== "") {
+        var url = "index.php?accion=cancelarCitas&cancelarDocumento=" + doc;
+        $("#paciente3").load(url);
+    }
 }
+
 function confirmarCancelar(numero) {
     if (confirm("¿Está seguro de cancelar la cita " + numero + "?")) {
         $.get("index.php", { accion: 'confirmarCancelar', numero: numero }, function (mensaje) {
             alert(mensaje);
+            $("#cancelarConsultar").trigger("click");
         });
     }
-    $("#cancelarConsultar").trigger("click");
 }

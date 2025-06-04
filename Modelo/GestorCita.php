@@ -62,9 +62,10 @@ class GestorCita {
         $apellidos = $paciente->obtenerApellidos();
         $fechaNacimiento = $paciente->obtenerFechaNacimiento();
         $sexo = $paciente->obtenerSexo();
+        $contrasena = $paciente->obtenerContrasena();
 
         $sql = "INSERT INTO Pacientes VALUES (
-            '$identificacion', '$nombres', '$apellidos', '$fechaNacimiento', '$sexo'
+            '$identificacion', '$nombres', '$apellidos', '$fechaNacimiento', '$sexo', '$contrasena'
         )";
 
         $conexion->consulta($sql);
@@ -147,24 +148,16 @@ class GestorCita {
         $identificacion = $medico->obtenerIdentificacion();
         $nombres = $medico->obtenerNombres();
         $apellidos = $medico->obtenerApellidos();
+        $contrasena = $medico->obtenerContrasena();
        
         $sql = "INSERT INTO medicos VALUES (
-            '$identificacion', '$nombres', '$apellidos'
+            '$identificacion', '$nombres', '$apellidos' , '$contrasena'
         )";
 
         $conexion->consulta($sql);
         $filasAfectadas = $conexion->obtenerFilasAfectadas();
         $conexion->cerrar();
 
-        return $filasAfectadas;
-    }
-    public function validarLoginUsuario($usuario,$contrasenia,$tipoUsuario) {
-        $conexion = new Conexion();
-        $conexion->abrir();
-        $sql = "SELECT * from usuarios WHERE UsuIdentificacion='$usuario' UsuContrasena='$contrasenia' UsuTipo='$tipoUsuario' ";
-        $conexion->consulta($sql);
-        $filasAfectadas = $conexion->obtenerFilasAfectadas();
-        $conexion->cerrar();
         return $filasAfectadas;
     }
 

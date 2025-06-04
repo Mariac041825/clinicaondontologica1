@@ -10,16 +10,21 @@ class Conexion
     public function abrir()
     {
         $this->mySQLI = new mysqli("localhost", "root", "", "citas");
-        if (mysqli_connect_error()) {
+
+        if ($this->mySQLI->connect_error) {
             return 0;
-        } else {
-            return 1;
         }
+        return 1;
     }
 
     public function cerrar()
     {
         $this->mySQLI->close();
+    }
+
+    public function getConexion()
+    {
+        return $this->mySQLI;
     }
 
     public function consulta($sql)
@@ -50,9 +55,8 @@ class Conexion
         $this->consulta("SELECT MedIdentificacion, MedNombres, MedApellidos FROM medicos");
         $medicos = [];
 
-        while ($fila = $this->obtenerResult()->fetch_assoc()) {
+        while ($fila = $this->result->fetch_assoc()) {
             $medicos[] = $fila;
-        } {
         }
 
         return $medicos;
@@ -64,10 +68,11 @@ class Conexion
         $stmt->bind_param("s", $id);
         $stmt->execute();
         $resultado = $stmt->get_result();
+
         return $resultado->fetch_assoc();
     }
 
-    public function cambiosmedico($id, $nombres, $apellidos)
+    public function cambiosMedico($id, $nombres, $apellidos)
     {
         $stmt = $this->mySQLI->prepare("UPDATE medicos SET MedNombres = ?, MedApellidos = ? WHERE MedIdentificacion = ?");
         $stmt->bind_param("sss", $nombres, $apellidos, $id);
@@ -75,11 +80,11 @@ class Conexion
         return $stmt->affected_rows;
     }
 
-    public function eliminarmedicos($id)
+    public function eliminarMedicos($id)
     {
         $stmt = $this->mySQLI->prepare("DELETE FROM medicos WHERE MedIdentificacion = ?");
         $stmt->bind_param("s", $id);
         $stmt->execute();
-       return $stmt->affected_rows;
+        return $stmt->affected_rows;
     }
 }

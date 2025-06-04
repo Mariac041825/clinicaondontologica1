@@ -3,12 +3,14 @@ class Medico {
     private $identificacion;
     private $nombres;
     private $apellidos;
+    private $contrasena;
    
 
-    public function __construct($ide, $nom, $ape ) {
+    public function __construct($ide, $nom, $ape, $cont ) {
         $this->identificacion = $ide;
         $this->nombres = $nom;
         $this->apellidos = $ape;
+        $this->contrasena = $cont;
     }
     
 
@@ -24,6 +26,9 @@ class Medico {
         return $this->apellidos;
     }
 
- 
+     public function obtenerContrasena() {
+        return $this->contrasena;
+    }
+
 }
 ?>

@@ -1,47 +1,26 @@
-<!DOCTYPE html>
-<!--
-To change this license header, choose License Headers in Project Properties.
-To change this template file, choose Tools | Templates
-and open the template in the editor.
--->
-<html>
-<head>
-    <meta charset="UTF-8">
-    <title></title>
-</head>
-<body>
-    <?php
-    if ($result->num_rows > 0) {
-    ?>
-        <table>
+<?php if ($result->num_rows > 0): ?>
+    <table class="table">
+        <thead>
             <tr>
                 <th>Número</th>
                 <th>Fecha</th>
                 <th>Hora</th>
+                <th>Acción</th>
             </tr>
-            <?php
-            while ($fila = $result->fetch_object()) {
-            ?>
+        </thead>
+        <tbody>
+            <?php while ($fila = $result->fetch_object()): ?>
                 <tr>
-                    <td><?php echo $fila->CitNumero; ?></td>
-                    <td><?php echo $fila->CitFecha; ?></td>
-                    <td><?php echo $fila->CitHora; ?></td>
+                    <td><?= htmlspecialchars($fila->CitNumero) ?></td>
+                    <td><?= htmlspecialchars($fila->CitFecha) ?></td>
+                    <td><?= htmlspecialchars($fila->CitHora) ?></td>
                     <td>
-                        <a href="#" onclick="confirmarCancelar(<?php echo $fila->CitNumero; ?>)">
-                            Cancelar
-                        </a>
+                        <a href="#" class="boton rojo" onclick="confirmarCancelar(<?= htmlspecialchars($fila->CitNumero) ?>)">Cancelar</a>
                     </td>
                 </tr>
-            <?php
-            }
-            ?>
-        </table>
-    <?php
-    } else {
-    ?>
-        <p>El paciente no tiene citas asignadas</p>
-    <?php
-    }
-    ?>
-</body>
-</html>
+            <?php endwhile; ?>
+        </tbody>
+    </table>
+<?php else: ?>
+    <p>El paciente no tiene citas asignadas.</p>
+<?php endif; ?>
